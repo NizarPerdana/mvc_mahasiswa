@@ -1,4 +1,4 @@
-    <?php
+<?php
 // config/database.php
 // Konfigurasi koneksi database menggunakan PDO
 

@@ -1,6 +1,5 @@
 <?php
 // core/Router.php
-// Kelas Router — memecah URL dan memanggil controller/method yang sesuai
 
 class Router
 {
@@ -8,19 +7,12 @@ class Router
     private string $method     = 'index';
     private array  $params     = [];
 
-    /**
-     * Memecah URL dari parameter GET menjadi:
-     * [0] controller, [1] method, [2..n] params
-     */
     public function parseURL(): array
     {
         $url = isset($_GET['url']) ? trim($_GET['url'], '/') : '';
         return $url ? explode('/', filter_var($url, FILTER_SANITIZE_URL)) : [];
     }
 
-    /**
-     * Menentukan controller, method, dan params lalu menjalankannya.
-     */
     public function run(): void
     {
         $urlParts = $this->parseURL();
@@ -39,8 +31,10 @@ class Router
             }
         }
 
-        // Load file controller
+        // Load BaseController dulu
         require_once COREPATH . 'Controller.php';
+
+        // Load controller
         require_once CONTROLLERPATH . $this->controller . '.php';
         $controllerObj = new $this->controller();
 
@@ -50,21 +44,18 @@ class Router
                 $this->method = $urlParts[1];
                 unset($urlParts[1]);
             } else {
-                $this->notFound("Method <strong>{$urlParts[1]}</strong> tidak ditemukan di controller <strong>{$this->controller}</strong>.");
+                $this->notFound("Method <strong>{$urlParts[1]}</strong> tidak ditemukan.");
                 return;
             }
         }
 
-        // Sisanya adalah params
+        // Params sisanya
         $this->params = array_values($urlParts);
 
-        // Panggil method dengan params
+        // Jalankan
         call_user_func_array([$controllerObj, $this->method], $this->params);
     }
 
-    /**
-     * Tampilkan halaman 404 sederhana.
-     */
     private function notFound(string $message): void
     {
         http_response_code(404);
