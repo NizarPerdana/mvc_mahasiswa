@@ -14,13 +14,15 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 10px;
             padding: 30px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
+
+        .nav-link { margin-bottom: 20px; }
 
         .header-row {
             display: flex;
@@ -31,22 +33,37 @@
 
         h1 { color: #2c3e50; font-size: 1.5em; }
 
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        .alert-success { background: #d5f5e3; color: #1e8449; border-left: 4px solid #2ecc71; }
+        .alert-error   { background: #fadbd8; color: #c0392b; border-left: 4px solid #e74c3c; }
+
         .btn {
             display: inline-block;
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 6px;
             text-decoration: none;
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: bold;
+            border: none;
+            cursor: pointer;
         }
-        .btn-home    { background: #95a5a6; color: white; }
-        .btn-primary { background: #3498db; color: white; }
-        .btn:hover   { opacity: 0.85; }
+        .btn-home      { background: #95a5a6; color: white; }
+        .btn-primary   { background: #3498db; color: white; }
+        .btn-warning   { background: #e67e22; color: white; }
+        .btn-danger    { background: #e74c3c; color: white; }
+        .btn:hover     { opacity: 0.85; }
+        .btn-sm        { padding: 5px 10px; font-size: 0.8em; }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.88em;
+            font-size: 0.87em;
         }
 
         thead tr {
@@ -73,32 +90,37 @@
         .badge-aktif    { background: #d5f5e3; color: #1e8449; }
         .badge-nonaktif { background: #fadbd8; color: #c0392b; }
 
+        .aksi-group {
+            display: flex;
+            gap: 5px;
+        }
+
         .empty-msg {
             text-align: center;
             padding: 40px;
             color: #999;
-        }
-
-        .nav-link {
-            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 <div class="container">
 
-    <!-- Navigasi atas -->
     <div class="nav-link">
         <a href="<?= BASEURL ?>" class="btn btn-home">← Beranda</a>
     </div>
 
-    <!-- Header -->
+    <!-- Flash Message -->
+    <?php if (!empty($flash)) : ?>
+        <div class="alert alert-<?= $flash['type'] === 'success' ? 'success' : 'error' ?>">
+            <?= $flash['message'] ?>
+        </div>
+    <?php endif; ?>
+
     <div class="header-row">
         <h1>📋 Data Mahasiswa</h1>
         <a href="<?= BASEURL ?>mahasiswa/create" class="btn btn-primary">+ Tambah Mahasiswa</a>
     </div>
 
-    <!-- Tabel -->
     <?php if (!empty($mahasiswas)) : ?>
     <table>
         <thead>
@@ -112,6 +134,7 @@
                 <th>Tanggal Lahir</th>
                 <th>Jenis Kelamin</th>
                 <th>Status</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -131,6 +154,20 @@
                     <?php else : ?>
                         <span class="badge badge-nonaktif">Nonaktif</span>
                     <?php endif; ?>
+                </td>
+                <td>
+                    <div class="aksi-group">
+                        <!-- Tombol Edit -->
+                        <a href="<?= BASEURL ?>mahasiswa/edit/<?= $mhs['id'] ?>"
+                           class="btn btn-warning btn-sm">✏️ Edit</a>
+
+                        <!-- Tombol Delete dengan konfirmasi -->
+                        <form action="<?= BASEURL ?>mahasiswa/delete/<?= $mhs['id'] ?>"
+                              method="POST"
+                              onsubmit="return confirm('Yakin hapus data <?= htmlspecialchars($mhs['nama_lengkap']) ?>?')">
+                            <button type="submit" class="btn btn-danger btn-sm">🗑️ Hapus</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             <?php endforeach; ?>
