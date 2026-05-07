@@ -1,59 +1,24 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'MVC Mahasiswa' ?></title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f4f8;
-        }
-        .card {
-            background: white;
-            padding: 40px 50px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 500px;
-        }
-        h1 { color: #2c3e50; margin-bottom: 10px; }
-        p  { color: #555; line-height: 1.6; }
-        .badge {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            margin-top: 15px;
-        }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 25px;
-            background: #2ecc71;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-        a:hover { background: #27ae60; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h1>👋 Selamat Datang!</h1>
-        <p>Aplikasi MVC Mahasiswa<br>
-        <strong>Praktikum FTI UNISKA 2026</strong></p>
-        <p>Kelompok kami siap belajar!</p>
-        <span class="badge">PHP MVC Tanpa Framework</span>
-        <br>
-        <a href="<?= BASEURL ?>mahasiswa">📋 Lihat Data Mahasiswa</a>
+<!-- app/views/home/index.php -->
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0 text-center p-4">
+            <div class="card-body">
+                <i class="bi bi-mortarboard-fill text-warning" style="font-size: 3.5rem;"></i>
+                <h2 class="card-title mt-3 fw-bold">Selamat Datang!</h2>
+                <p class="card-text text-muted">
+                    Aplikasi CRUD Mahasiswa berbasis <strong>PHP MVC</strong><br>
+                    Praktikum FTI UNISKA 2026
+                </p>
+                <p class="text-muted">Kelompok kami siap belajar! 🚀</p>
+                <hr>
+                <a href="<?= BASEURL ?>mahasiswa" class="btn btn-primary me-2">
+                    <i class="bi bi-people-fill me-1"></i>Lihat Data Mahasiswa
+                </a>
+                <a href="<?= BASEURL ?>mahasiswa/create" class="btn btn-success">
+                    <i class="bi bi-person-plus-fill me-1"></i>Tambah Mahasiswa
+                </a>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+</div>

@@ -5,14 +5,13 @@ class Controller
 {
     public function __construct()
     {
-        // Mulai session untuk flash message
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
 
     /**
-     * Load dan tampilkan view
+     * Load dan tampilkan view — otomatis dibungkus header & footer
      */
     public function view(string $view, array $data = []): void
     {
@@ -20,11 +19,19 @@ class Controller
 
         $viewFile = VIEWPATH . $view . '.php';
 
-        if (file_exists($viewFile)) {
-            require_once $viewFile;
-        } else {
+        if (!file_exists($viewFile)) {
             die("View tidak ditemukan: <strong>{$viewFile}</strong>");
         }
+
+        // Tangkap konten view ke variabel $content
+        ob_start();
+        require_once $viewFile;
+        $content = ob_get_clean();
+
+        // Tampilkan: header → konten → footer
+        require_once VIEWPATH . 'layouts/header.php';
+        echo $content;
+        require_once VIEWPATH . 'layouts/footer.php';
     }
 
     /**
@@ -43,8 +50,7 @@ class Controller
     }
 
     /**
-     * Set flash message ke session
-     * $type : 'success' atau 'error'
+     * Set flash message
      */
     public function setFlash(string $type, string $message): void
     {
@@ -55,7 +61,7 @@ class Controller
     }
 
     /**
-     * Ambil flash message lalu hapus dari session
+     * Ambil & hapus flash message
      */
     public function flash(): ?array
     {
@@ -68,7 +74,7 @@ class Controller
     }
 
     /**
-     * Redirect ke URL tertentu
+     * Redirect ke URL
      */
     public function redirect(string $url): void
     {

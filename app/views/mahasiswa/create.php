@@ -1,192 +1,109 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Tambah Mahasiswa' ?></title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+<!-- app/views/mahasiswa/create.php -->
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f4f8;
-            padding: 30px;
-        }
+<div class="row justify-content-center">
+    <div class="col-md-7">
 
-        .container {
-            max-width: 650px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            padding: 35px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus-fill me-2"></i>Tambah Data Mahasiswa
+                </h5>
+            </div>
+            <div class="card-body p-4">
 
-        .nav-link { margin-bottom: 20px; }
+                <!-- Flash Message -->
+                <?php if (!empty($flash)) : ?>
+                    <div class="alert alert-<?= $flash['type'] === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show">
+                        <?= $flash['message'] ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <?php endif; ?>
 
-        h1 { color: #2c3e50; font-size: 1.4em; margin-bottom: 25px; }
+                <form action="<?= BASEURL ?>mahasiswa/store" method="POST">
 
-        .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-        .alert-success { background: #d5f5e3; color: #1e8449; border-left: 4px solid #2ecc71; }
-        .alert-error   { background: #fadbd8; color: #c0392b; border-left: 4px solid #e74c3c; }
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">NPM <span class="text-danger">*</span></label>
+                        <input type="text" name="npm" class="form-control"
+                               placeholder="Contoh: 2300101009"
+                               value="<?= htmlspecialchars($old['npm'] ?? '') ?>">
+                    </div>
 
-        .form-group {
-            margin-bottom: 18px;
-        }
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
+                        <input type="text" name="nama_lengkap" class="form-control"
+                               placeholder="Nama lengkap mahasiswa"
+                               value="<?= htmlspecialchars($old['nama_lengkap'] ?? '') ?>">
+                    </div>
 
-        label {
-            display: block;
-            font-size: 0.88em;
-            font-weight: bold;
-            color: #444;
-            margin-bottom: 6px;
-        }
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Fakultas <span class="text-danger">*</span></label>
+                        <input type="text" name="fakultas" class="form-control"
+                               placeholder="Contoh: Fakultas Teknologi Informasi"
+                               value="<?= htmlspecialchars($old['fakultas'] ?? '') ?>">
+                    </div>
 
-        input[type="text"],
-        input[type="date"],
-        select {
-            width: 100%;
-            padding: 9px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 0.92em;
-            transition: border 0.2s;
-        }
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Jurusan <span class="text-danger">*</span></label>
+                        <select name="jurusan" class="form-select">
+                            <option value="">-- Pilih Jurusan --</option>
+                            <option value="Teknik Informatika"
+                                <?= (($old['jurusan'] ?? '') === 'Teknik Informatika') ? 'selected' : '' ?>>
+                                Teknik Informatika
+                            </option>
+                            <option value="Sistem Informasi"
+                                <?= (($old['jurusan'] ?? '') === 'Sistem Informasi') ? 'selected' : '' ?>>
+                                Sistem Informasi
+                            </option>
+                        </select>
+                    </div>
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: #3498db;
-        }
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tempat Lahir <span class="text-danger">*</span></label>
+                        <input type="text" name="tempat_lahir" class="form-control"
+                               placeholder="Contoh: Banjarmasin"
+                               value="<?= htmlspecialchars($old['tempat_lahir'] ?? '') ?>">
+                    </div>
 
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            margin-top: 5px;
-        }
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tanggal Lahir <span class="text-danger">*</span></label>
+                        <input type="date" name="tanggal_lahir" class="form-control"
+                               value="<?= htmlspecialchars($old['tanggal_lahir'] ?? '') ?>">
+                    </div>
 
-        .radio-group label {
-            font-weight: normal;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Jenis Kelamin <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-4 mt-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="jenis_kelamin" value="Laki-laki" id="lakiLaki"
+                                       <?= (($old['jenis_kelamin'] ?? '') === 'Laki-laki') ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="lakiLaki">
+                                    <i class="bi bi-gender-male text-primary me-1"></i>Laki-laki
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="jenis_kelamin" value="Perempuan" id="perempuan"
+                                       <?= (($old['jenis_kelamin'] ?? '') === 'Perempuan') ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="perempuan">
+                                    <i class="bi bi-gender-female text-danger me-1"></i>Perempuan
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save-fill me-1"></i>Simpan Data
+                        </button>
+                        <a href="<?= BASEURL ?>mahasiswa" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Batal
+                        </a>
+                    </div>
 
-        .btn {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.92em;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-primary { background: #3498db; color: white; }
-        .btn-secondary { background: #95a5a6; color: white; }
-        .btn:hover { opacity: 0.85; }
-
-        .required { color: #e74c3c; }
-    </style>
-</head>
-<body>
-<div class="container">
-
-    <div class="nav-link">
-        <a href="<?= BASEURL ?>mahasiswa" class="btn btn-secondary">← Kembali ke Daftar</a>
-    </div>
-
-    <h1>➕ Tambah Data Mahasiswa</h1>
-
-    <!-- Flash Message -->
-    <?php if (!empty($flash)) : ?>
-        <div class="alert alert-<?= $flash['type'] === 'success' ? 'success' : 'error' ?>">
-            <?= $flash['message'] ?>
-        </div>
-    <?php endif; ?>
-
-    <!-- Form -->
-    <form action="<?= BASEURL ?>mahasiswa/store" method="POST">
-
-        <div class="form-group">
-            <label>NPM <span class="required">*</span></label>
-            <input type="text" name="npm" placeholder="Contoh: 2300101009"
-                   value="<?= htmlspecialchars($old['npm'] ?? '') ?>">
-        </div>
-
-        <div class="form-group">
-            <label>Nama Lengkap <span class="required">*</span></label>
-            <input type="text" name="nama_lengkap" placeholder="Nama lengkap mahasiswa"
-                   value="<?= htmlspecialchars($old['nama_lengkap'] ?? '') ?>">
-        </div>
-
-        <div class="form-group">
-            <label>Fakultas <span class="required">*</span></label>
-            <input type="text" name="fakultas" placeholder="Contoh: Fakultas Teknologi Informasi"
-                   value="<?= htmlspecialchars($old['fakultas'] ?? '') ?>">
-        </div>
-
-        <div class="form-group">
-            <label>Jurusan <span class="required">*</span></label>
-            <select name="jurusan">
-                <option value="">-- Pilih Jurusan --</option>
-                <option value="Teknik Informatika"
-                    <?= (($old['jurusan'] ?? '') === 'Teknik Informatika') ? 'selected' : '' ?>>
-                    Teknik Informatika
-                </option>
-                <option value="Sistem Informasi"
-                    <?= (($old['jurusan'] ?? '') === 'Sistem Informasi') ? 'selected' : '' ?>>
-                    Sistem Informasi
-                </option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Tempat Lahir <span class="required">*</span></label>
-            <input type="text" name="tempat_lahir" placeholder="Contoh: Banjarmasin"
-                   value="<?= htmlspecialchars($old['tempat_lahir'] ?? '') ?>">
-        </div>
-
-        <div class="form-group">
-            <label>Tanggal Lahir <span class="required">*</span></label>
-            <input type="date" name="tanggal_lahir"
-                   value="<?= htmlspecialchars($old['tanggal_lahir'] ?? '') ?>">
-        </div>
-
-        <div class="form-group">
-            <label>Jenis Kelamin <span class="required">*</span></label>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="jenis_kelamin" value="Laki-laki"
-                        <?= (($old['jenis_kelamin'] ?? '') === 'Laki-laki') ? 'checked' : '' ?>>
-                    Laki-laki
-                </label>
-                <label>
-                    <input type="radio" name="jenis_kelamin" value="Perempuan"
-                        <?= (($old['jenis_kelamin'] ?? '') === 'Perempuan') ? 'checked' : '' ?>>
-                    Perempuan
-                </label>
+                </form>
             </div>
         </div>
 
-        <div class="btn-row">
-            <button type="submit" class="btn btn-primary">💾 Simpan Data</button>
-            <a href="<?= BASEURL ?>mahasiswa" class="btn btn-secondary">Batal</a>
-        </div>
-
-    </form>
+    </div>
 </div>
-</body>
-</html>
