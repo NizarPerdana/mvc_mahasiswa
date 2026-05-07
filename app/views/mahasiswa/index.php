@@ -33,6 +33,7 @@
 
         h1 { color: #2c3e50; font-size: 1.5em; }
 
+        /* Alert */
         .alert {
             padding: 12px 16px;
             border-radius: 6px;
@@ -43,6 +44,37 @@
         .alert-success { background: #d5f5e3; color: #1e8449; border-left: 4px solid #2ecc71; }
         .alert-error   { background: #fadbd8; color: #c0392b; border-left: 4px solid #e74c3c; }
 
+        /* Form Pencarian */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .search-box input[type="text"],
+        .search-box select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .search-box input[type="text"] { width: 250px; }
+        .search-box select             { width: 200px; }
+
+        .search-box input:focus,
+        .search-box select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Tombol */
         .btn {
             display: inline-block;
             padding: 8px 16px;
@@ -55,11 +87,14 @@
         }
         .btn-home      { background: #95a5a6; color: white; }
         .btn-primary   { background: #3498db; color: white; }
+        .btn-success   { background: #2ecc71; color: white; }
         .btn-warning   { background: #e67e22; color: white; }
         .btn-danger    { background: #e74c3c; color: white; }
+        .btn-reset     { background: #bdc3c7; color: #333; }
         .btn:hover     { opacity: 0.85; }
         .btn-sm        { padding: 5px 10px; font-size: 0.8em; }
 
+        /* Tabel */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -100,11 +135,24 @@
             padding: 40px;
             color: #999;
         }
+
+        /* Info hasil filter */
+        .result-info {
+            font-size: 0.85em;
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .result-info span {
+            color: #2980b9;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 <div class="container">
 
+    <!-- Navigasi -->
     <div class="nav-link">
         <a href="<?= BASEURL ?>" class="btn btn-home">← Beranda</a>
     </div>
@@ -116,11 +164,49 @@
         </div>
     <?php endif; ?>
 
+    <!-- Header -->
     <div class="header-row">
         <h1>📋 Data Mahasiswa</h1>
         <a href="<?= BASEURL ?>mahasiswa/create" class="btn btn-primary">+ Tambah Mahasiswa</a>
     </div>
 
+    <!-- Form Pencarian & Filter -->
+    <form action="<?= BASEURL ?>mahasiswa" method="GET" class="search-box">
+        <input type="text"
+               name="search"
+               placeholder="🔍 Cari NPM atau Nama..."
+               value="<?= htmlspecialchars($search ?? '') ?>">
+
+        <select name="jurusan">
+            <option value="">-- Semua Jurusan --</option>
+            <option value="Teknik Informatika"
+                <?= (($jurusan ?? '') === 'Teknik Informatika') ? 'selected' : '' ?>>
+                Teknik Informatika
+            </option>
+            <option value="Sistem Informasi"
+                <?= (($jurusan ?? '') === 'Sistem Informasi') ? 'selected' : '' ?>>
+                Sistem Informasi
+            </option>
+        </select>
+
+        <button type="submit" class="btn btn-success">🔍 Cari</button>
+        <a href="<?= BASEURL ?>mahasiswa" class="btn btn-reset">↺ Reset</a>
+    </form>
+
+    <!-- Info hasil pencarian -->
+    <?php if (!empty($search) || !empty($jurusan)) : ?>
+        <p class="result-info">
+            Menampilkan <span><?= count($mahasiswas) ?></span> hasil
+            <?php if (!empty($search)) : ?>
+                untuk kata kunci "<span><?= htmlspecialchars($search) ?></span>"
+            <?php endif; ?>
+            <?php if (!empty($jurusan)) : ?>
+                — jurusan "<span><?= htmlspecialchars($jurusan) ?></span>"
+            <?php endif; ?>
+        </p>
+    <?php endif; ?>
+
+    <!-- Tabel Data -->
     <?php if (!empty($mahasiswas)) : ?>
     <table>
         <thead>
@@ -157,11 +243,9 @@
                 </td>
                 <td>
                     <div class="aksi-group">
-                        <!-- Tombol Edit -->
                         <a href="<?= BASEURL ?>mahasiswa/edit/<?= $mhs['id'] ?>"
                            class="btn btn-warning btn-sm">✏️ Edit</a>
 
-                        <!-- Tombol Delete dengan konfirmasi -->
                         <form action="<?= BASEURL ?>mahasiswa/delete/<?= $mhs['id'] ?>"
                               method="POST"
                               onsubmit="return confirm('Yakin hapus data <?= htmlspecialchars($mhs['nama_lengkap']) ?>?')">
@@ -180,8 +264,13 @@
 
     <?php else : ?>
     <div class="empty-msg">
-        <p>😕 Belum ada data mahasiswa.</p>
-        <a href="<?= BASEURL ?>mahasiswa/create" class="btn btn-primary" style="margin-top:15px;">+ Tambah Sekarang</a>
+        <?php if (!empty($search) || !empty($jurusan)) : ?>
+            <p>😕 Tidak ada data yang cocok dengan pencarian.</p>
+            <a href="<?= BASEURL ?>mahasiswa" class="btn btn-reset" style="margin-top:15px;">↺ Tampilkan Semua</a>
+        <?php else : ?>
+            <p>😕 Belum ada data mahasiswa.</p>
+            <a href="<?= BASEURL ?>mahasiswa/create" class="btn btn-primary" style="margin-top:15px;">+ Tambah Sekarang</a>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
 

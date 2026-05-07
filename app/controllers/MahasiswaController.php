@@ -13,15 +13,29 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Tampilkan daftar mahasiswa
+     * Tampilkan daftar mahasiswa dengan pencarian & filter
      */
     public function index(): void
     {
+        // Ambil parameter GET
+        $search  = trim($_GET['search']  ?? '');
+        $jurusan = trim($_GET['jurusan'] ?? '');
+
+        // Gunakan searchAndFilter jika ada parameter, getAll jika tidak
+        if (!empty($search) || !empty($jurusan)) {
+            $mahasiswas = $this->mahasiswaModel->searchAndFilter($search, $jurusan);
+        } else {
+            $mahasiswas = $this->mahasiswaModel->getAll();
+        }
+
         $data = [
             'title'      => 'Data Mahasiswa - MVC UNISKA',
-            'mahasiswas' => $this->mahasiswaModel->getAll(),
+            'mahasiswas' => $mahasiswas,
             'flash'      => $this->flash(),
+            'search'     => $search,
+            'jurusan'    => $jurusan,
         ];
+
         $this->view('mahasiswa/index', $data);
     }
 

@@ -20,7 +20,7 @@ class Mahasiswa
     }
 
     /**
-     * Ambil satu data mahasiswa berdasarkan ID
+     * Ambil satu data berdasarkan ID
      */
     public function find(int $id): ?array
     {
@@ -31,7 +31,7 @@ class Mahasiswa
     }
 
     /**
-     * Cek apakah NPM sudah ada (exclude id tertentu untuk keperluan edit)
+     * Cek NPM sudah ada (exclude id tertentu untuk edit)
      */
     public function isNpmExist(string $npm, int $excludeId = 0): bool
     {
@@ -47,9 +47,9 @@ class Mahasiswa
      */
     public function create(array $data): bool
     {
-        $sql = 'INSERT INTO mahasiswa 
+        $sql = 'INSERT INTO mahasiswa
                     (npm, nama_lengkap, fakultas, jurusan, tempat_lahir, tanggal_lahir, jenis_kelamin, status_id)
-                VALUES 
+                VALUES
                     (:npm, :nama_lengkap, :fakultas, :jurusan, :tempat_lahir, :tanggal_lahir, :jenis_kelamin, 1)';
 
         $stmt = $this->db->prepare($sql);
@@ -100,4 +100,32 @@ class Mahasiswa
         $stmt = $this->db->prepare('DELETE FROM mahasiswa WHERE id = :id');
         return $stmt->execute([':id' => $id]);
     }
+
+    /**
+ * Cari dan filter data mahasiswa secara dinamis
+ */
+public function searchAndFilter(string $search = '', string $jurusan = ''): array
+{
+    $sql    = 'SELECT * FROM mahasiswa WHERE 1=1';
+    $params = [];
+
+    // Gunakan :search_npm dan :search_nama (dua parameter berbeda)
+    if (!empty($search)) {
+        $sql .= ' AND (npm LIKE :search_npm OR nama_lengkap LIKE :search_nama)';
+        $params[':search_npm']  = '%' . $search . '%';
+        $params[':search_nama'] = '%' . $search . '%';
+    }
+
+    // Filter jurusan
+    if (!empty($jurusan)) {
+        $sql .= ' AND jurusan = :jurusan';
+        $params[':jurusan'] = $jurusan;
+    }
+
+    $sql .= ' ORDER BY id DESC';
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
 }
