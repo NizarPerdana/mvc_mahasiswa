@@ -10,10 +10,21 @@
 <?php endif; ?>
 
 <!-- Header -->
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h4 class="fw-bold mb-0">
         <i class="bi bi-people-fill me-2 text-primary"></i>Data Mahasiswa
     </h4>
+    <div class="d-flex gap-2 flex-wrap">
+        <!-- Tombol Export — parameter filter ikut terbawa -->
+        <a href="<?= BASEURL ?>mahasiswa/exportCSV<?= (!empty($search) || !empty($jurusan)) ? '?search=' . urlencode($search ?? '') . '&jurusan=' . urlencode($jurusan ?? '') : '' ?>"
+           class="btn btn-success btn-sm">
+            <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i>Export CSV
+        </a>
+        <a href="<?= BASEURL ?>mahasiswa/exportPDF<?= (!empty($search) || !empty($jurusan)) ? '?search=' . urlencode($search ?? '') . '&jurusan=' . urlencode($jurusan ?? '') : '' ?>"
+           class="btn btn-danger btn-sm">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i>Export PDF
+        </a>
+    </div>
 </div>
 
 <!-- Form Pencarian & Filter -->

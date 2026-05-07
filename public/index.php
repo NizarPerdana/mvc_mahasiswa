@@ -10,11 +10,16 @@ define('VIEWPATH',       APPPATH  . 'views'       . DIRECTORY_SEPARATOR);
 define('CONTROLLERPATH', APPPATH  . 'controllers' . DIRECTORY_SEPARATOR);
 define('MODELPATH',      APPPATH  . 'models'      . DIRECTORY_SEPARATOR);
 
-// 2. Load config & core
+// 2. Load Composer autoload (untuk Dompdf)
+if (file_exists(BASEPATH . 'vendor/autoload.php')) {
+    require_once BASEPATH . 'vendor/autoload.php';
+}
+
+// 3. Load config & core
 require_once BASEPATH . 'config' . DIRECTORY_SEPARATOR . 'database.php';
 require_once COREPATH . 'Database.php';
 require_once COREPATH . 'Router.php';
 
-// 3. Jalankan router
+// 4. Jalankan router
 $router = new Router();
 $router->run();
