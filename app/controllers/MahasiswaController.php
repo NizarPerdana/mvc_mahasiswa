@@ -13,10 +13,12 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Tampilkan daftar mahasiswa dengan pencarian & filter
+     * Tampilkan daftar mahasiswa — semua role boleh
      */
     public function index(): void
     {
+        $this->requireLogin();
+
         $search  = trim($_GET['search']  ?? '');
         $jurusan = trim($_GET['jurusan'] ?? '');
 
@@ -38,23 +40,28 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Tampilkan form tambah
+     * Tampilkan form tambah — hanya admin
      */
     public function create(): void
     {
+        $this->requireAdmin();
+
         $data = [
             'title' => 'Tambah Mahasiswa - MVC UNISKA',
             'flash' => $this->flash(),
             'old'   => [],
         ];
+
         $this->view('mahasiswa/create', $data);
     }
 
     /**
-     * Proses simpan data baru
+     * Proses simpan data baru — hanya admin
      */
     public function store(): void
     {
+        $this->requireAdmin();
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('mahasiswa');
             return;
@@ -112,10 +119,12 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Tampilkan form edit
+     * Tampilkan form edit — hanya admin
      */
     public function edit(int $id): void
     {
+        $this->requireAdmin();
+
         $mahasiswa = $this->mahasiswaModel->find($id);
 
         if (!$mahasiswa) {
@@ -129,14 +138,17 @@ class MahasiswaController extends Controller
             'flash'     => $this->flash(),
             'mahasiswa' => $mahasiswa,
         ];
+
         $this->view('mahasiswa/edit', $data);
     }
 
     /**
-     * Proses update data
+     * Proses update data — hanya admin
      */
     public function update(int $id): void
     {
+        $this->requireAdmin();
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('mahasiswa');
             return;
@@ -161,14 +173,14 @@ class MahasiswaController extends Controller
         $jenisKelaminValid = ['Laki-laki', 'Perempuan'];
 
         $errors = [];
-        if (empty($npm))                                            $errors[] = 'NPM tidak boleh kosong.';
-        elseif ($this->mahasiswaModel->isNpmExist($npm, $id))       $errors[] = 'NPM sudah digunakan mahasiswa lain.';
-        if (empty($nama_lengkap))                                   $errors[] = 'Nama lengkap tidak boleh kosong.';
-        if (empty($fakultas))                                       $errors[] = 'Fakultas tidak boleh kosong.';
-        if (!in_array($jurusan, $jurusanValid))                     $errors[] = 'Jurusan tidak valid.';
-        if (empty($tempat_lahir))                                   $errors[] = 'Tempat lahir tidak boleh kosong.';
-        if (empty($tanggal_lahir))                                  $errors[] = 'Tanggal lahir tidak boleh kosong.';
-        if (!in_array($jenis_kelamin, $jenisKelaminValid))          $errors[] = 'Jenis kelamin tidak valid.';
+        if (empty($npm))                                          $errors[] = 'NPM tidak boleh kosong.';
+        elseif ($this->mahasiswaModel->isNpmExist($npm, $id))     $errors[] = 'NPM sudah digunakan mahasiswa lain.';
+        if (empty($nama_lengkap))                                 $errors[] = 'Nama lengkap tidak boleh kosong.';
+        if (empty($fakultas))                                     $errors[] = 'Fakultas tidak boleh kosong.';
+        if (!in_array($jurusan, $jurusanValid))                   $errors[] = 'Jurusan tidak valid.';
+        if (empty($tempat_lahir))                                 $errors[] = 'Tempat lahir tidak boleh kosong.';
+        if (empty($tanggal_lahir))                                $errors[] = 'Tanggal lahir tidak boleh kosong.';
+        if (!in_array($jenis_kelamin, $jenisKelaminValid))        $errors[] = 'Jenis kelamin tidak valid.';
 
         if (!empty($errors)) {
             $this->setFlash('error', implode('<br>', $errors));
@@ -201,10 +213,12 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Hapus data
+     * Hapus data — hanya admin
      */
     public function delete(int $id): void
     {
+        $this->requireAdmin();
+
         $mahasiswa = $this->mahasiswaModel->find($id);
 
         if (!$mahasiswa) {
@@ -225,11 +239,12 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Export data ke CSV
+     * Export CSV — semua role boleh
      */
     public function exportCSV(): void
     {
-        // Ambil data (ikuti filter jika ada)
+        $this->requireLogin();
+
         $search  = trim($_GET['search']  ?? '');
         $jurusan = trim($_GET['jurusan'] ?? '');
 
@@ -239,26 +254,21 @@ class MahasiswaController extends Controller
             $mahasiswas = $this->mahasiswaModel->getAll();
         }
 
-        // Set header HTTP untuk download CSV
         $filename = 'data_mahasiswa_' . date('Ymd_His') . '.csv';
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Pragma: no-cache');
         header('Expires: 0');
 
-        // BOM agar Excel bisa baca UTF-8 dengan benar
         echo "\xEF\xBB\xBF";
 
-        // Buka output stream
         $output = fopen('php://output', 'w');
 
-        // Tulis baris header kolom
         fputcsv($output, [
             'ID', 'NPM', 'Nama Lengkap', 'Fakultas', 'Jurusan',
             'Tempat Lahir', 'Tanggal Lahir', 'Jenis Kelamin', 'Status'
         ]);
 
-        // Tulis data baris per baris
         foreach ($mahasiswas as $mhs) {
             fputcsv($output, [
                 $mhs['id'],
@@ -278,11 +288,12 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Export data ke PDF menggunakan Dompdf
+     * Export PDF — semua role boleh
      */
     public function exportPDF(): void
     {
-        // Ambil data (ikuti filter jika ada)
+        $this->requireLogin();
+
         $search  = trim($_GET['search']  ?? '');
         $jurusan = trim($_GET['jurusan'] ?? '');
 
@@ -292,7 +303,6 @@ class MahasiswaController extends Controller
             $mahasiswas = $this->mahasiswaModel->getAll();
         }
 
-        // Buat HTML untuk PDF
         $html  = '<!DOCTYPE html><html><head>';
         $html .= '<meta charset="UTF-8">';
         $html .= '<style>
@@ -310,17 +320,10 @@ class MahasiswaController extends Controller
         $html .= '<p class="sub">Dicetak pada: ' . date('d M Y H:i:s') . ' | Total: ' . count($mahasiswas) . ' mahasiswa</p>';
         $html .= '<table>';
         $html .= '<thead><tr>
-                    <th>No</th>
-                    <th>NPM</th>
-                    <th>Nama Lengkap</th>
-                    <th>Fakultas</th>
-                    <th>Jurusan</th>
-                    <th>Tempat Lahir</th>
-                    <th>Tanggal Lahir</th>
-                    <th>Jenis Kelamin</th>
-                    <th>Status</th>
-                  </tr></thead>';
-        $html .= '<tbody>';
+                    <th>No</th><th>NPM</th><th>Nama Lengkap</th>
+                    <th>Fakultas</th><th>Jurusan</th><th>Tempat Lahir</th>
+                    <th>Tanggal Lahir</th><th>Jenis Kelamin</th><th>Status</th>
+                  </tr></thead><tbody>';
 
         $no = 1;
         foreach ($mahasiswas as $mhs) {
@@ -341,7 +344,6 @@ class MahasiswaController extends Controller
         $html .= '<p class="footer">Sistem Informasi Mahasiswa &mdash; FTI UNISKA 2026</p>';
         $html .= '</body></html>';
 
-        // Inisialisasi Dompdf
         $options = new \Dompdf\Options();
         $options->set('defaultFont', 'Arial');
         $options->set('isRemoteEnabled', true);
@@ -351,7 +353,6 @@ class MahasiswaController extends Controller
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
 
-        // Stream ke browser sebagai download
         $filename = 'data_mahasiswa_' . date('Ymd_His') . '.pdf';
         $dompdf->stream($filename, ['Attachment' => true]);
         exit;

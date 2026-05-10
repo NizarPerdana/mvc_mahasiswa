@@ -23,12 +23,10 @@ class Controller
             die("View tidak ditemukan: <strong>{$viewFile}</strong>");
         }
 
-        // Tangkap konten view ke variabel $content
         ob_start();
         require_once $viewFile;
         $content = ob_get_clean();
 
-        // Tampilkan: header → konten → footer
         require_once VIEWPATH . 'layouts/header.php';
         echo $content;
         require_once VIEWPATH . 'layouts/footer.php';
@@ -80,5 +78,61 @@ class Controller
     {
         header('Location: ' . BASEURL . $url);
         exit;
+    }
+
+    /**
+     * Cek apakah user sudah login
+     * Jika belum, redirect ke halaman login
+     */
+    public function requireLogin(): void
+    {
+        if (empty($_SESSION['user_id'])) {
+            $this->setFlash('error', 'Silakan login terlebih dahulu.');
+            $this->redirect('auth/login');
+        }
+    }
+
+    /**
+     * Cek apakah user adalah admin
+     * Jika bukan, redirect ke index dengan pesan error
+     */
+    public function requireAdmin(): void
+    {
+        $this->requireLogin();
+        if ($_SESSION['user_role'] !== 'admin') {
+            $this->setFlash('error', 'Akses ditolak. Hanya admin yang bisa melakukan aksi ini.');
+            $this->redirect('mahasiswa');
+        }
+    }
+
+    /**
+     * Ambil data user yang sedang login
+     */
+    public function currentUser(): ?array
+    {
+        if (!empty($_SESSION['user_id'])) {
+            return [
+                'id'       => $_SESSION['user_id'],
+                'username' => $_SESSION['user_username'],
+                'role'     => $_SESSION['user_role'],
+            ];
+        }
+        return null;
+    }
+
+    /**
+     * Cek apakah sudah login (return bool)
+     */
+    public function isLoggedIn(): bool
+    {
+        return !empty($_SESSION['user_id']);
+    }
+
+    /**
+     * Cek apakah role admin (return bool)
+     */
+    public function isAdmin(): bool
+    {
+        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
     }
 }

@@ -24,6 +24,11 @@
            class="btn btn-danger btn-sm">
             <i class="bi bi-file-earmark-pdf-fill me-1"></i>Export PDF
         </a>
+        <?php if (!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') : ?>
+    <a href="<?= BASEURL ?>mahasiswa/create" class="btn btn-primary btn-sm">
+        <i class="bi bi-person-plus-fill me-1"></i>Tambah Mahasiswa
+    </a>
+<?php endif; ?>
     </div>
 </div>
 
@@ -122,20 +127,24 @@
                     <?php endif; ?>
                 </td>
                 <td>
-                    <div class="d-flex gap-1">
-                        <a href="<?= BASEURL ?>mahasiswa/edit/<?= $mhs['id'] ?>"
-                           class="btn btn-warning btn-sm">
-                            <i class="bi bi-pencil-fill"></i>
-                        </a>
-                        <form action="<?= BASEURL ?>mahasiswa/delete/<?= $mhs['id'] ?>"
-                              method="POST"
-                              onsubmit="return confirm('Yakin hapus data <?= htmlspecialchars($mhs['nama_lengkap']) ?>?')">
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash-fill"></i>
-                            </button>
-                        </form>
-                    </div>
-                </td>
+    <?php if (!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') : ?>
+    <div class="d-flex gap-1">
+        <a href="<?= BASEURL ?>mahasiswa/edit/<?= $mhs['id'] ?>"
+           class="btn btn-warning btn-sm">
+            <i class="bi bi-pencil-fill"></i>
+        </a>
+        <form action="<?= BASEURL ?>mahasiswa/delete/<?= $mhs['id'] ?>"
+              method="POST"
+              onsubmit="return confirm('Yakin hapus data <?= htmlspecialchars($mhs['nama_lengkap']) ?>?')">
+            <button type="submit" class="btn btn-danger btn-sm">
+                <i class="bi bi-trash-fill"></i>
+            </button>
+        </form>
+    </div>
+    <?php else : ?>
+        <span class="text-muted small">—</span>
+    <?php endif; ?>
+</td>
             </tr>
             <?php endforeach; ?>
         </tbody>
